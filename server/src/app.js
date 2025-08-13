@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
-import logger from "./util/logger.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import authRoutes from "./routes/auth.routes.js";
+import { CustomError } from "./util/customError.js";
+import { customResponse } from "./util/responseHandler.js";
 
 const app = express();
 
@@ -8,9 +11,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test route
-app.get("/", (req, res) => {
-  res.json({ message: "API is running " });
+// Routes
+app.use("/api/auth", authRoutes);
+
+app.use((req, res, next) => {
+ customResponse(res, "Page Not Found", {}, 404);
 });
+
+app.use(errorHandler);
 
 export default app;
