@@ -70,3 +70,66 @@ const { password: userPassword, ...userWithoutPassword } = user;
     next(err);
   }
 };
+
+
+/**
+ * @desc Change user password
+ * @route POST /api/auth/change-password
+ */
+export const changePassword = async (req, res, next) => {
+    try {
+        const { email, oldPassword, newPassword } = req.body;
+
+        // Find user
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            throw new CustomError("User not found", 404);
+        }
+
+        // Compare old password
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            throw new CustomError("Old password is incorrect", 401);
+        }
+
+        // Hash new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update user password
+        await prisma.user.update({
+            where: { email },
+            data: { password: hashedNewPassword }
+        });
+
+        return customResponse(res, "Password changed successfully", {}, 200);
+    } catch (err) {
+        next(err);
+    }
+};
+
+/**
+ * @desc Get user profile
+ * @route GET /api/auth/profile
+ */
+export const getProfile = async (req, res, next) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                address: true,
+                role: true
+            }
+        });
+
+        if (!user) {
+            throw new CustomError("User not found", 404);
+        }
+
+        return customResponse(res, "User profile retrieved successfully", user, 200);
+    } catch (err) {
+        next(err);
+    }
+};
