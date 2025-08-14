@@ -4,6 +4,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import { CustomError } from "./util/customError.js";
 import storeRoutes from "./routes/store.routes.js";
+import ratingRoutes from "./routes/rating.routes.js";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/stores", storeRoutes);
+app.use("/api/ratings", ratingRoutes);
 
 app.use((req, res, next) => {
  return new CustomError("Not Found", 404);
