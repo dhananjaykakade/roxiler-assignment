@@ -54,7 +54,9 @@ export const updateStore = async (req, res, next) => {
 
 export const listAllStores = async (req, res, next) => {
   try {
-    const { search, order = "desc" } = req.query; // default desc
+    const { search, order = "desc", page = 1, limit = 10 } = req.query; // default desc
+    const skip = Number(page - 1) * Number(limit);
+
 
     const where = search
       ? {
@@ -67,6 +69,8 @@ export const listAllStores = async (req, res, next) => {
 
     const stores = await prisma.store.findMany({
       where,
+                skip,
+          take: Number(limit),
       include: {
         owner: { select: { id: true, name: true, email: true } }
       },

@@ -94,7 +94,7 @@ export const getAverageRatingForStore = async (req, res, next) => {
     if (!storeId) {
         throw new CustomError("invalid store id", 400);
     }
-    
+
 
     const averageRating = await prisma.rating.aggregate({
       where: { storeId },
@@ -102,6 +102,34 @@ export const getAverageRatingForStore = async (req, res, next) => {
     });
 
     return customResponse(res, "Average rating fetched successfully", averageRating);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+// Get list of users who rated a specific store (Owner/Admin only)
+export const getUsersWhoRatedStore = async (req, res, next) => {
+  try {
+    const { storeId } = req.params;
+
+    // Check store exists
+    const store = await prisma.store.findUnique({ where: { id: storeId } });
+    if (!store) throw new CustomError("Store not found", 404);
+
+    const ratings = await prisma.rating.findMany({
+      where: { storeId },
+      select: {
+        value: true,
+        createdAt: true,
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return customResponse(res, "Users who rated this store fetched successfully", ratings);
   } catch (err) {
     next(err);
   }

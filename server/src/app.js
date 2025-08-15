@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes.js";
 import { CustomError } from "./util/customError.js";
 import storeRoutes from "./routes/store.routes.js";
 import ratingRoutes from "./routes/rating.routes.js";
+import adminRoutes from "./routes/admin.routes.js"
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/stores", storeRoutes);
 app.use("/api/ratings", ratingRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((req, res, next) => {
  return new CustomError("Not Found", 404);
