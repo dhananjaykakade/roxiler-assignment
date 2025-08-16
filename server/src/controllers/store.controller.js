@@ -72,12 +72,31 @@ export const listAllStores = async (req, res, next) => {
                 skip,
           take: Number(limit),
       include: {
-        owner: { select: { id: true, name: true, email: true } }
+        owner: { select: { id: true, name: true, email: true } },
+        ratings: { select: { value: true ,userId: true,user: { select: { name: true } } } },
       },
       orderBy: { createdAt: order.toLowerCase() === "asc" ? "asc" : "desc" }
     });
 
-    return customResponse(res, "Stores fetched successfully", stores);
+    const averageRating = stores.map(store => {
+            const updatedRatings = store.ratings.map(r => ({
+        value: r.value,
+        userId: r.userId,
+        name: r.user.name
+      }));
+
+      const total = store.ratings.reduce((acc, curr) => acc + curr.value, 0);
+      return {
+        id: store.id,
+        name: store.name,
+        address: store.address,
+        owner: store.owner,
+        averageRating: total / store.ratings.length || 0,
+        rating:updatedRatings
+      };
+    });
+
+    return customResponse(res, "Stores fetched successfully", { stores: averageRating });
   } catch (err) {
     next(err);
   }
