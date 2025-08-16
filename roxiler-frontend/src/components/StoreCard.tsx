@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { Star } from 'lucide-react';
-import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
 
 interface Store {
@@ -23,16 +23,23 @@ interface Store {
 }
 
 interface Ratings {
+  id:string
   userId: string;
   value: number;
 name: string;
 }
 
 
-const StoreCard = ({ store, onRate , checkIfRated,userId }: { store: Store, onRate: (store: Store) => void , checkIfRated: (rating: Ratings[],userId: string | null) => boolean,userId:string | null }) => {
+const StoreCard = ({ store, onRate , checkIfRated,userId,editRating }: { store: Store, onRate: (store: Store) => void , checkIfRated: (rating: Ratings[],userId: string | null) => boolean,userId:string | null, editRating: (store: Store) => void}) => {
+const [totalUserRated,setTotalUserRated] = useState<number>(0);
+const [userSubmittedRating,setUserSubmittedRating] = useState<number | null>(null);
 
 
-
+useEffect(() => {
+  setTotalUserRated(Number(store.rating.length));
+  const userRating = store.rating.find(r => r.userId === userId);
+  setUserSubmittedRating(userRating ? userRating.value : null);
+}, [store.rating, userId]);
 
   return (
     <Card
@@ -54,6 +61,20 @@ const StoreCard = ({ store, onRate , checkIfRated,userId }: { store: Store, onRa
   )}
 </div>
 
+{totalUserRated > 0 && (
+  <div className="flex items-center gap-2 text-sm">
+    <span className="font-medium text-yellow-800">Total Users Rated:</span>{" "}
+    {totalUserRated}
+  </div>
+)}
+
+{userSubmittedRating !== null && (
+  <div className="flex items-center gap-2 text-sm">
+    <span className="font-medium text-yellow-800">Your Rating:</span>{" "}
+    <Star className="w-4 h-4 text-amber-400" /> {userSubmittedRating} / 5
+  </div>
+)}
+
       </CardHeader>
 
       <CardContent className="space-y-2 text-sm text-gray-600">
@@ -68,13 +89,15 @@ const StoreCard = ({ store, onRate , checkIfRated,userId }: { store: Store, onRa
       </CardContent>
 
       <CardFooter>
- <Button
-        className="mt-4"
-        onClick={() => onRate(store)}
-        disabled={checkIfRated(store.rating, userId || null)}
-      >
-        {checkIfRated(store.rating, userId|| null) ? "Already Rated" : "Rate"}
-      </Button>
+        {checkIfRated(store.rating, userId || null) ? (
+          <Button className="mt-4 cursor-pointer" onClick={() => editRating(store)}>
+            Edit Rating
+          </Button>
+        ) : (
+          <Button className="mt-4 cursor-pointer" onClick={() => onRate(store)}>
+            Rate
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

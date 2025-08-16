@@ -1,7 +1,6 @@
 import prisma from "../util/prisma.js";
 import { customResponse } from "../util/responseHandler.js";
 import { CustomError } from "../util/customError.js";
-import { th } from "zod/v4/locales";
 
 export const addRating = async (req, res, next) => {
   try {
@@ -29,7 +28,6 @@ export const addRating = async (req, res, next) => {
   }
 };
 
-// Update rating
 export const updateRating = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -48,7 +46,6 @@ export const updateRating = async (req, res, next) => {
   }
 };
 
-// Delete rating
 export const deleteRating = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -70,7 +67,6 @@ export const deleteRating = async (req, res, next) => {
   }
 };
 
-// Get all ratings for a store
 export const getRatingsForStore = async (req, res, next) => {
   try {
     const { storeId } = req.params;
@@ -107,8 +103,6 @@ export const getAverageRatingForStore = async (req, res, next) => {
   }
 };
 
-
-// Get list of users who rated a specific store (Owner/Admin only)
 export const getUsersWhoRatedStore = async (req, res, next) => {
   try {
     const { storeId } = req.params;

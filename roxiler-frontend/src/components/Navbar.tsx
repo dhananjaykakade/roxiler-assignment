@@ -23,7 +23,7 @@ const Navbar = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-black hover:bg-gray-100 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 cursor-pointer hover:text-black hover:bg-gray-100 focus:outline-none"
             >
               <svg
                 className="h-6 w-6"
@@ -53,25 +53,24 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex sm:space-x-4 sm:items-center">
-            {/* if user is admin then redirect to admin dashboard same for Owner and if page is profile then show home instead */}
             {user?.role === "ADMIN" && window.location.pathname === "/profile" ? (
-              <Button variant="ghost" onClick={() => navigate("/admin/dashboard")}>
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/admin/dashboard")}>
                 Admin Dashboard
               </Button>
             ) : user?.role === "OWNER" && window.location.pathname === "/profile" ? (
-              <Button variant="ghost" onClick={() => navigate("/owner/dashboard")}>
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/owner/dashboard")}>
                 Owner Dashboard
               </Button>
             ) : window.location.pathname === "/profile" ? (
-              <Button variant="ghost" onClick={() => navigate("/user/dashboard")}>
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/")}>
                 Home
               </Button>
             ) : (
-              <Button variant="ghost" onClick={() => navigate("/profile")}>
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/profile")}>
                 Profile
               </Button>
             )}
-            <Button variant="destructive" onClick={handleLogout}>
+            <Button variant="destructive" className="cursor-pointer" onClick={handleLogout}>
               Logout
             </Button>
           </div>
@@ -81,10 +80,24 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="sm:hidden px-4 pb-4 space-y-2">
-          <Button variant="ghost" className="w-full" onClick={() => navigate("/profile")}>
-            Profile
-          </Button>
-          <Button variant="destructive" className="w-full" onClick={handleLogout}>
+ {user?.role === "ADMIN" && window.location.pathname === "/profile" ? (
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/admin/dashboard")}>
+                Admin Dashboard
+              </Button>
+            ) : user?.role === "OWNER" && window.location.pathname === "/profile" ? (
+              <Button className="w-full cursor-pointer" variant="ghost" onClick={() => navigate("/owner/dashboard")}>
+                Owner Dashboard
+              </Button>
+            ) : window.location.pathname === "/profile" ? (
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/")}>
+                Home
+              </Button>
+            ) : (
+              <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/profile")}>
+                Profile
+              </Button>
+            )}
+          <Button variant="destructive" className="w-full cursor-pointer" onClick={handleLogout}>
             Logout
           </Button>
         </div>

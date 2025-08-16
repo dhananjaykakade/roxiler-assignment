@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import api from "@/api/axios";
 import StoreCard from "@/components/StoreCard";
 import Navbar from "@/components/Navbar";
-import {Label} from "@/components/ui/label";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -35,15 +35,14 @@ interface Store {
   rating: Ratings[];
 }
 interface Ratings {
+  id: string;
   userId: string;
   value: number;
   name: string;
 }
 
-
- 
 const Dashboard = () => {
-  const { user,loading } = useAuth();
+  const { user, loading } = useAuth();
   const [error, setError] = useState("");
   const [componentLoading, setComponentLoading] = useState(false);
   const [stores, setStores] = useState<Store[]>([]);
@@ -53,8 +52,7 @@ const Dashboard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [rating, setRating] = useState<number | null>(null);
-
-
+  const [ratingId, setRatingId] = useState<string | null>(null);
 
   const fetchStores = async (
     query?: string,
@@ -81,7 +79,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchStores(searchTerm.trim(), currentPage, itemsPerPage);
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage, user]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,32 +88,56 @@ const Dashboard = () => {
   };
 
   const handleRateClick = (store: Store) => {
-  setSelectedStore(store);
-  setIsDialogOpen(true);
-};
+    setSelectedStore(store);
+    setIsDialogOpen(true);
+    const existingRating = store.rating.find((r) => r.userId === user?.id);
+    if (existingRating) {
+      setRating(existingRating.value);
+      setRatingId(existingRating.id);
+    } else {
+      setRating(null);
+      setRatingId(null);
+    }
+  };
 
-const checkIfRated = (ratings: Ratings[], userId: string | null) => {
-  if (!userId) return false;
-  return !!ratings.find(rating => rating.userId === userId);
-};
+  const checkIfRated = (ratings: Ratings[], userId: string | null) => {
+    if (!userId) return false;
+    return !!ratings.find((rating) => rating.userId === userId);
+  };
 
+  const submitRating = async () => {
+    if (!selectedStore || !rating) return;
 
-const submitRating = async () => {
-  if (!selectedStore || !rating) return;
-
-  try {
-    await api.post(`/api/ratings`, {
+    try {
+      await api.post(`/api/ratings`, {
         storeId: selectedStore.id,
-        value:rating
-    });
-    setIsDialogOpen(false);
-    fetchStores(searchTerm.trim(), currentPage, itemsPerPage);
-  } catch (error) {
-    console.error("Error submitting rating", error);
-    setError( error.response?.data?.message || "error submitting rating");
-  }
-};
+        value: rating,
+      });
+      setIsDialogOpen(false);
+      fetchStores(searchTerm.trim(), currentPage, itemsPerPage);
+    } catch (error: any) {
+      console.error("Error submitting rating", error);
+      setError(error.response?.data?.message || "error submitting rating");
+    }
+  };
 
+  const editRating = async () => {
+    if (!selectedStore || !rating) return;
+
+    try {
+      setComponentLoading(true);
+      await api.put(`/api/ratings/${ratingId}`, {
+        value: rating,
+      });
+      setIsDialogOpen(false);
+      fetchStores(searchTerm.trim(), currentPage, itemsPerPage);
+    } catch (error: any) {
+      console.error("Error editing rating", error);
+      setError(error.response?.data?.message || "error editing rating");
+    } finally {
+      setComponentLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -124,6 +146,12 @@ const submitRating = async () => {
       </div>
     );
   }
+  if (!user)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-lg font-medium">
+        Please log in to view.
+      </div>
+    );
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -146,7 +174,7 @@ const submitRating = async () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 rounded-lg"
           />
-          <Button type="submit" className="w-full sm:w-auto">
+          <Button type="submit" className="w-full sm:w-auto cursor-pointer">
             Search
           </Button>
         </form>
@@ -158,7 +186,14 @@ const submitRating = async () => {
         ) : stores.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 pt-10 lg:grid-cols-3">
             {stores.map((store) => (
-              <StoreCard key={store.id} store={store} onRate={handleRateClick} checkIfRated={checkIfRated} userId={user?.id} />
+              <StoreCard
+                key={store.id}
+                store={store}
+                onRate={handleRateClick}
+                checkIfRated={checkIfRated}
+                userId={user.id}
+                editRating={handleRateClick}
+              />
             ))}
           </div>
         ) : (
@@ -172,6 +207,7 @@ const submitRating = async () => {
         <div className="flex flex-wrap justify-between items-center gap-3 py-4">
           <div className="flex items-center gap-2">
             <Button
+              className="cursor-pointer"
               onClick={() => setCurrentPage((p) => p - 1)}
               disabled={currentPage === 1}
             >
@@ -179,6 +215,7 @@ const submitRating = async () => {
             </Button>
             <span>Page {currentPage}</span>
             <Button
+              className="cursor-pointer"
               onClick={() => setCurrentPage((p) => p + 1)}
               disabled={stores.length < itemsPerPage}
             >
@@ -201,30 +238,51 @@ const submitRating = async () => {
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Rate {selectedStore?.name}</DialogTitle>
-    </DialogHeader>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {selectedStore && checkIfRated(selectedStore.rating, user.id)
+                  ? `Edit Rating for ${selectedStore.name}`
+                  : `Rate ${selectedStore?.name}`}
+              </DialogTitle>
+            </DialogHeader>
 
-    <RadioGroup onValueChange={(val) => setRating(Number(val))} className="space-y-2">
-      {[1, 2, 3, 4, 5].map((num) => (
-        <div key={num} className="flex items-center space-x-2">
-          <RadioGroupItem value={num.toString()} id={`rating-${num}`} />
-          <Label htmlFor={`rating-${num}`}>{num}</Label>
-        </div>
-      ))}
-    </RadioGroup>
+            <RadioGroup
+              value={rating?.toString() || ""}
+              onValueChange={(val) => setRating(Number(val))}
+              className="space-y-2"
+            >
+              {[1, 2, 3, 4, 5].map((num) => (
+                <div key={num} className="flex items-center space-x-2">
+                  <RadioGroupItem value={num.toString()} id={`rating-${num}`} />
+                  <Label htmlFor={`rating-${num}`}>{num}</Label>
+                </div>
+              ))}
+            </RadioGroup>
 
-    <DialogFooter>
-      <Button variant="secondary" onClick={() => setIsDialogOpen(false)}>
-        Cancel
-      </Button>
-      <Button onClick={submitRating} disabled={!rating}>
-        Submit
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+            <DialogFooter>
+              <Button
+                variant="secondary"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() =>
+                  selectedStore && checkIfRated(selectedStore.rating, user.id)
+                    ? editRating()
+                    : submitRating()
+                }
+                disabled={!rating || !selectedStore}
+                className="cursor-pointer"
+              >
+                {selectedStore && checkIfRated(selectedStore.rating, user.id)
+                  ? "Update Rating"
+                  : "Submit"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

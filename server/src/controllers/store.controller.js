@@ -9,15 +9,16 @@ import { CustomError } from "../util/customError.js";
  */
 export const createStore = async (req, res, next) => {
   try {
-    const { name, address, ownerId } = req.body;
+    const { name, address } = req.body;
+    const { id } = req.user;
 
-    const owner = await prisma.user.findUnique({ where: { id: ownerId } });
+    const owner = await prisma.user.findUnique({ where: { id } });
     if (!owner || owner.role !== "OWNER") {
       throw new CustomError("Invalid ownerId", 400);
     }
 
     const store = await prisma.store.create({
-      data: { name, address, ownerId }
+      data: { name, address, ownerId: id }
     });
 
     return customResponse(res, "Store created successfully", store, 201);
@@ -60,26 +61,27 @@ export const listAllStores = async (req, res, next) => {
 
     const where = search
       ? {
-          OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { address: { contains: search, mode: "insensitive" } }
-          ]
-        }
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { address: { contains: search, mode: "insensitive" } }
+        ]
+      }
       : {};
 
     const stores = await prisma.store.findMany({
       where,
-                skip,
-          take: Number(limit),
+      skip,
+      take: Number(limit),
       include: {
         owner: { select: { id: true, name: true, email: true } },
-        ratings: { select: { value: true ,userId: true,user: { select: { name: true } } } },
+        ratings: { select: { id: true, value: true, userId: true, user: { select: { name: true } } } },
       },
       orderBy: { createdAt: order.toLowerCase() === "asc" ? "asc" : "desc" }
     });
 
     const averageRating = stores.map(store => {
-            const updatedRatings = store.ratings.map(r => ({
+      const updatedRatings = store.ratings.map(r => ({
+        id: r.id,
         value: r.value,
         userId: r.userId,
         name: r.user.name
@@ -92,7 +94,7 @@ export const listAllStores = async (req, res, next) => {
         address: store.address,
         owner: store.owner,
         averageRating: total / store.ratings.length || 0,
-        rating:updatedRatings
+        rating: updatedRatings
       };
     });
 
@@ -114,4 +116,18 @@ export const getStoreById = async (req, res, next) => {
     next(err);
   }
 };
-
+export const getStoreByOwnerId = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const store = await prisma.store.findFirst({
+      where: { ownerId: id },
+      include: { ratings: { include: { user: true } } },
+    })
+    if (!store) {
+      throw new CustomError("Store not found", 404);
+    }
+    return customResponse(res, "Store retrieved successfully", store, 200);
+  } catch (err) {
+    next(err);
+  }
+};
