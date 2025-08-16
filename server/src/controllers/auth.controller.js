@@ -46,21 +46,14 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    // Find user 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new CustomError("Invalid email or password", 401);
     }
-
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new CustomError("Invalid email or password", 401);
     }
-
-
-    // Generate token
     const token = generateToken({ id: user.id, role: user.role });
 
 const { password: userPassword, ...userWithoutPassword } = user;

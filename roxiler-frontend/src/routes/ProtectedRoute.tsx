@@ -9,8 +9,12 @@ export default function ProtectedRoute({ allowedRoles }: { allowedRoles: string[
   }
 
   if (allowedRoles && (!role || !allowedRoles.includes(role))) {
+    if(role=="OWNER")
+    return <Navigate to="/owner/dashboard" replace />;
+    if(role=="USER")
     return <Navigate to="/" replace />;
   }
+
 
   return <Outlet />;
 }

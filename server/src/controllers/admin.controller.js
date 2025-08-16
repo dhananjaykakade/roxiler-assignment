@@ -1,6 +1,5 @@
 import prisma from "../util/prisma.js";
 import bcrypt from "bcrypt";
-import { generateToken } from "../util/jwt.js";
 import { customResponse } from "../util/responseHandler.js";
 import { CustomError } from "../util/customError.js";
 
@@ -32,7 +31,19 @@ export const getAllUsers = async (req, res, next) => {
           name: true,
           email: true,
           address: true,
-          role: true
+          role: true,
+           stores: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              ratings: {
+                select: {
+                  value: true
+                }
+              }
+            }
+          }
         },
         skip,
         take: Number(limit)
@@ -40,11 +51,29 @@ export const getAllUsers = async (req, res, next) => {
       prisma.user.count({ where })
     ]);
 
+const usersWithRatings = users.map(user => {
+  let averageRating = null;
+
+  if (user.role === "OWNER" && user.stores.length > 0) {
+    const store = user.stores[0];
+    if (store.ratings.length > 0) {
+      const total = store.ratings.map(r => r.value).reduce((sum, value) => sum + value, 0);
+      averageRating = total / store.ratings.length;
+    }
+    
+  }
+
+  return {
+    ...user,
+    averageRating,
+  }
+});
+
     return customResponse(res, "Users fetched successfully", {
       total,
       page: Number(page),
       totalPages: Math.ceil(total / limit),
-      users
+      users: usersWithRatings
     });
   } catch (err) {
     next(err);
