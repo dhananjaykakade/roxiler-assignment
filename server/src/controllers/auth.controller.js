@@ -10,7 +10,7 @@ import { CustomError } from "../util/customError.js";
 
 export const signup = async (req, res, next) => {
   try {
-    const { name, email, password, address } = req.body;
+    const { name, email, password, address ,role} = req.body;
 
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -28,8 +28,8 @@ export const signup = async (req, res, next) => {
         email,
         password: hashedPassword,
         address,
-        role: "USER"
-      },
+        role: role
+            },
       select: { id: true, name: true, email: true, address: true, role: true }
     });
 
