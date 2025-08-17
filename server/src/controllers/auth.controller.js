@@ -4,8 +4,11 @@ import { generateToken } from "../util/jwt.js";
 import { customResponse } from "../util/responseHandler.js";
 import { CustomError } from "../util/customError.js";
 /**
- * @desc Register a new Normal User
+ * @desc Register a new Normal User as User or store Owner
  * @route POST /api/auth/signup
+ * @access Public
+ * @body { name, email, password, address, role }
+ * @returns {Promise<Response>}
  */
 
 export const signup = async (req, res, next) => {
@@ -40,8 +43,11 @@ export const signup = async (req, res, next) => {
 };
 
 /**
- * @desc Login and get JWT token
+ * @desc Login and get JWT token 
  * @route POST /api/auth/login
+ * @access Public
+ * @body { email, password }
+ * @returns {Promise<Response>}
  */
 export const login = async (req, res, next) => {
   try {
@@ -68,6 +74,9 @@ const { password: userPassword, ...userWithoutPassword } = user;
 /**
  * @desc Change user password
  * @route POST /api/auth/change-password
+ * @access Private only to authorized users
+ * @body { email, oldPassword, newPassword }
+ * @returns {Promise<Response>}
  */
 export const changePassword = async (req, res, next) => {
     try {
@@ -103,6 +112,7 @@ export const changePassword = async (req, res, next) => {
 /**
  * @desc Get user profile
  * @route GET /api/auth/profile
+ * @access Private only to authorized users
  */
 export const getProfile = async (req, res, next) => {
     try {

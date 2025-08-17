@@ -29,6 +29,8 @@ export function CustomTable<T extends { [key: string]: any }>({
   const [sortKey, setSortKey] = useState<keyof T | null>(null)
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
+
+  // Sorting logic if a column is clicked then we sort the data based on the column key and order
   const sortedData = [...data].sort((a, b) => {
     if (!sortKey) return 0
     if (a[sortKey] < b[sortKey]) return sortOrder === "asc" ? -1 : 1
@@ -36,6 +38,7 @@ export function CustomTable<T extends { [key: string]: any }>({
     return 0
   })
 
+  // i added a handler for sorting when a column header is clicked then we update the sort key and order
   const handleSort = (key?: keyof T) => {
     if (!key) return
     if (sortKey === key) {

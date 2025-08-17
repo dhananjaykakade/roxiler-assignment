@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+
+/**
+ * @description User signup validation schema
+ * @requires { zod } for schema validation
+ * @returns { z.ZodSchema } Zod validation schema
+ * 
+ */
 export const signupSchema = z.object({
   name: z
     .string()
@@ -17,6 +24,11 @@ export const signupSchema = z.object({
     .max(400, "Address cannot exceed 400 characters")
 });
 
+/**
+ * @description User login validation schema
+ * @requires { zod } for schema validation
+ * @returns { z.ZodSchema } Zod validation schema
+ */
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters long")

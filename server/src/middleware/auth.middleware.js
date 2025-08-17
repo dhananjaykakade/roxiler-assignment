@@ -2,6 +2,12 @@ import jwt from "jsonwebtoken";
 
 import {CustomError} from "../util/customError.js";
 
+
+/**
+ * @desc Authenticate user
+ * @requires { headers } from user
+ * @returns {Promise<Response>}
+ */
 export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -26,6 +32,12 @@ export const authMiddleware = async (req, res, next) => {
   }
 };
 
+
+/**
+ * @desc check user role
+ * @requires { user } from request
+ * @returns {Promise<Response>}
+ */
 export const checkRole = (roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {

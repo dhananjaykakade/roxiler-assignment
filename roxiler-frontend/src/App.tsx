@@ -17,7 +17,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Public Routes */}
+        {/* Public Routes open to all the usrs */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -31,7 +31,7 @@ export default function App() {
           </Route>
         </Route>
 
-        {/* User Routes */}
+        {/* User Routes only for authenticated users */}
         <Route element={<ProtectedRoute allowedRoles={["USER", "ADMIN"]} />}>
           <Route path="/" element={<UserDashboard />} />
         </Route>

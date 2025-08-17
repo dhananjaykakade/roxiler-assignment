@@ -3,9 +3,11 @@ import { customResponse } from "../util/responseHandler.js";
 import { CustomError } from "../util/customError.js";
 
 /**
- * Create a new store
- * @param {*} req - Request object containing name, address, and ownerId
- * @param {*} res - Response object
+ * @desc create a new store
+ * @access Private only to authenticated user
+ * @body { name, address } store details
+ * @requires { userId } from user
+ * @returns {Promise<Response>}
  */
 export const createStore = async (req, res, next) => {
   try {
@@ -26,39 +28,18 @@ export const createStore = async (req, res, next) => {
     next(err);
   }
 };
-
 /**
- * Update an existing store
- * @param {*} req - Request object containing storeId, name, and address
- * @param {*} res - Response object
+ * @desc get list all the stores
+ * @access public any user
+ * @query { search, order, page, limit }
+ * @returns {Promise<Response>}
  */
-export const updateStore = async (req, res, next) => {
-  try {
-    // incoming data should be optional
-    const { storeId, name, address } = req.body;
-
-    const store = await prisma.store.findUnique({ where: { id: storeId } });
-    if (!store) {
-      throw new CustomError("Store not found", 404);
-    }
-
-    const updatedStore = await prisma.store.update({
-      where: { id: storeId },
-      data: { name, address }
-    });
-
-    return customResponse(res, "Store updated successfully", updatedStore, 200);
-  } catch (err) {
-    next(err);
-  }
-};
-
 export const listAllStores = async (req, res, next) => {
   try {
-    const { search, order = "desc", page = 1, limit = 10 } = req.query; // default desc
+    const { search, order = "desc", page = 1, limit = 10 } = req.query; 
     const skip = Number(page - 1) * Number(limit);
 
-
+    // i made a change here user can now search by store name and address should be capital or not does not matter
     const where = search
       ? {
         OR: [
@@ -68,6 +49,8 @@ export const listAllStores = async (req, res, next) => {
       }
       : {};
 
+
+      // i added pagination so that if huge amount of data is there it can be fetched in chunks
     const stores = await prisma.store.findMany({
       where,
       skip,
@@ -79,6 +62,7 @@ export const listAllStores = async (req, res, next) => {
       orderBy: { createdAt: order.toLowerCase() === "asc" ? "asc" : "desc" }
     });
 
+    // i added a calculation for average rating with mapping of required fields
     const averageRating = stores.map(store => {
       const updatedRatings = store.ratings.map(r => ({
         id: r.id,
@@ -87,6 +71,7 @@ export const listAllStores = async (req, res, next) => {
         name: r.user.name
       }));
 
+      // i added a calculation for total rating which return the sum of all ratings
       const total = store.ratings.reduce((acc, curr) => acc + curr.value, 0);
       return {
         id: store.id,
@@ -104,6 +89,12 @@ export const listAllStores = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc get store by id 
+ * @access Private only to authenticated user
+ * @params { id } store id
+ * @returns {Promise<Response>}
+ */
 export const getStoreById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -116,6 +107,12 @@ export const getStoreById = async (req, res, next) => {
     next(err);
   }
 };
+/**
+ * @desc get store by owner id
+ * @access Private only to authenticated user
+ * @requires { userId } from user
+ * @returns {Promise<Response>}
+ */
 export const getStoreByOwnerId = async (req, res, next) => {
   try {
     const { id } = req.user;
