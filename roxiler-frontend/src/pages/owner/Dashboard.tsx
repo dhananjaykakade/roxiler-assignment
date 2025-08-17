@@ -47,20 +47,21 @@ export default function OwnerDashboard() {
   const [form, setForm] = useState({ name: "", address: "" });
   const { user } = useAuth();
 
+  const fetchStore = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/api/stores/get/owner`);
+      setStore(res.data.data || null);
+    } catch (error) {
+      console.error("Error fetching store:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
 
-    const fetchStore = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get(`/api/stores/get/owner`);
-        setStore(res.data.data || null);
-      } catch (error) {
-        console.error("Error fetching store:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchStore();
   }, [user]);
 
@@ -69,7 +70,9 @@ export default function OwnerDashboard() {
     setLoading(true);
     try {
       const res = await api.post("/api/stores", form);
-      setStore(res.data.data.store);
+      if (res.data.success) {
+        fetchStore();
+      }
     } catch (error) {
       console.error("Error creating store:", error);
     } finally {

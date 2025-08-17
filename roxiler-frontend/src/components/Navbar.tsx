@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,33 +26,10 @@ const Navbar = () => {
               type="button"
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 cursor-pointer hover:text-black hover:bg-gray-100 focus:outline-none"
             >
-              <svg
-                className="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
 
-          {/* Desktop Menu */}
           <div className="hidden sm:flex sm:space-x-4 sm:items-center">
             {user?.role === "ADMIN" && window.location.pathname === "/profile" ? (
               <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/admin/dashboard")}>

@@ -7,6 +7,14 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -21,7 +29,7 @@ const Register = () => {
     email: "",
     address: "",
     password: "",
-    role: "",
+    role: "USER",
   });
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -58,12 +66,9 @@ const Register = () => {
     return true;
   };
 
-  const handleRoleChange = (newRole: string) => {
-    setFormData((prev) => ({ ...prev, role: newRole }));
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(formData);
     if (!validateForm()) return;
 
     setLoading(true);
@@ -108,31 +113,26 @@ const Register = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer text-gray-700 ">
-                <input
-                  type="radio"
-                  value="USER"
-                  checked={formData.role === "USER"}
-                  onChange={() => handleRoleChange("USER")}
-                  className="accent-blue-500"
-                />
-                User
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer text-gray-700 ">
-                <input
-                  type="radio"
-                  value="OWNER"
-                  checked={formData.role === "OWNER"}
-                  onChange={() => handleRoleChange("OWNER")}
-                  className="accent-blue-500"
-                />
-                Store Owner
-              </label>
-            </div>
-
             {/* Form Fields */}
             <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">Register As</label>
+          <Select
+            onValueChange={(val) =>
+              setFormData((prev) => ({ ...prev, role: val }))
+            }
+            value={formData.role}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="USER">User</SelectItem>
+              <SelectItem value="OWNER">Store Owner</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
                 <p className="text-xs text-red-500 italic">
@@ -198,7 +198,11 @@ const Register = () => {
                 />
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full cursor-pointer"
+              >
                 {loading ? "Registering..." : "Register"}
               </Button>
             </form>
