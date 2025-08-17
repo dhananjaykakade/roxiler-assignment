@@ -8,6 +8,8 @@ dotenv.config();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
+
+// I started the server using immediate invocation of an async function
 (async function startServer() {
   try {
     await prisma.$connect();

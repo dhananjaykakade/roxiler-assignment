@@ -30,6 +30,7 @@ const Navbar = () => {
             </button>
           </div>
 
+{/* In desktop navbar we simply check the user role and render the appropriate button */}
           <div className="hidden sm:flex sm:space-x-4 sm:items-center">
             {user?.role === "ADMIN" && window.location.pathname === "/profile" ? (
               <Button className="cursor-pointer" variant="ghost" onClick={() => navigate("/admin/dashboard")}>
@@ -55,7 +56,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* same as desktop navbar we doing to mobile view */}
       {isOpen && (
         <div className="sm:hidden px-4 pb-4 space-y-2">
  {user?.role === "ADMIN" && window.location.pathname === "/profile" ? (

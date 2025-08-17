@@ -6,6 +6,11 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
+/**
+ * @description User authentication routes
+ * @access Public
+ */
+
 router.post("/signup", validate(signupSchema), signup);
 router.post("/login", validate(loginSchema), login);
 router.post("/change-password", authMiddleware, changePassword);

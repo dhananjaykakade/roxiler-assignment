@@ -1,4 +1,3 @@
-// src/pages/admin/Users.tsx
 import { CustomTable } from "@/components/CustomTable";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";

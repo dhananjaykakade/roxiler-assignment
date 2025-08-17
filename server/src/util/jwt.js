@@ -1,6 +1,11 @@
 import jwt from "jsonwebtoken";
 import { CustomError } from "./customError.js";
 
+
+/**
+ * @desc Generate JWT token
+ * @description Generate JWT token
+ */
 export const generateToken = (payload, expiresIn = "1d") => {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
 };

@@ -4,6 +4,11 @@ import {getAllStoresWithRating,getAllUsers,getDashboardStats,getUserById,createU
 
 
 const router = Router();
+/**
+ * @description Admin routes
+ * @access Private only to authenticated users with admin role
+ */
+
 
 router.get("/users", authMiddleware, checkRole("ADMIN"), getAllUsers);
 router.get("/users/:id", authMiddleware, checkRole("ADMIN"), getUserById);

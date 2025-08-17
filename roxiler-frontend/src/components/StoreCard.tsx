@@ -8,6 +8,7 @@ import {
 import { Button } from "./ui/button";
 import { Star } from 'lucide-react';
 import { useEffect, useState } from "react";
+import { Badge } from "./ui/badge";
 
 
 interface Store {
@@ -50,10 +51,26 @@ useEffect(() => {
         <CardTitle className="text-lg font-semibold">{store.name}</CardTitle>
 <div className="flex items-center gap-2 text-sm">
   {store.averageRating > 0 ? (
+<>
     <span className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-yellow-800 rounded-full">
       <Star className="w-4 h-4 text-amber-400" /> {store.averageRating.toFixed(1)}
       <span className="text-md text-gray-500">/ 5</span>
     </span>
+
+    <div>
+      {store.averageRating >= 4 ? (
+        <div className="flex gap-1">
+        <Badge variant="default" className="bg-green-100 text-green-800">Highly Rated</Badge>
+        <Badge variant="default" className="bg-purple-100 text-purple-800">Recommended</Badge>
+        </div>
+      ) : store.averageRating >= 3 ? (
+        <Badge variant="default" className="bg-yellow-100 text-yellow-800">Moderately Rated</Badge>
+      ) : (
+        <Badge variant="default" className="bg-red-100 text-red-800">Low Rated</Badge>
+      )}
+    </div>
+    
+    </>
   ) : (
     <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
       No ratings yet

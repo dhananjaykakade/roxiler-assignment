@@ -4,6 +4,13 @@ import { customResponse } from "../util/responseHandler.js";
 import { CustomError } from "../util/customError.js";
 
 
+/**
+ * @desc Get all users
+ * @access Private only to admin
+ * @query { search, order, role, page, limit }
+ * @description Get all users with pagination and filtering
+ * @returns {Promise<Response>}
+ */
 export const getAllUsers = async (req, res, next) => {
   try {
     const { search, order = "desc", role, page = 1, limit = 10 } = req.query;
@@ -80,6 +87,12 @@ const usersWithRatings = users.map(user => {
   }
 };
 
+/**
+ * @desc Get User by ID
+ * @access Private only to admin
+ * @params { id }
+ * @returns {Promise<Response>}
+ */
 export const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -114,7 +127,12 @@ export const getUserById = async (req, res, next) => {
   }
 };
 
-
+/**
+ * @desc create a new user from admin panel
+ * @access Private only to admin
+ * @body { name, email, password, address, role }
+ * @returns {Promise<Response>}
+ */
 export const createUser = async (req, res, next) => {
   try {
     const { name, email, password, address, role } = req.body;
@@ -134,6 +152,11 @@ export const createUser = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc Get all stores with ratings
+ * @access Private only to admin
+ * @returns {Promise<Response>}
+ */
 export const getAllStoresWithRating = async (req, res, next) => {
   try {
     const stores = await prisma.store.findMany({
@@ -154,6 +177,12 @@ export const getAllStoresWithRating = async (req, res, next) => {
   }
 };
 
+
+/**
+ * @desc Get dashboard statistics
+ * @access Private only to admin
+ * @returns {Promise<Response>}
+ */
 export const getDashboardStats = async (req, res, next) => {
   try {
     const [userCount, storeCount, ratingCount] = await Promise.all([

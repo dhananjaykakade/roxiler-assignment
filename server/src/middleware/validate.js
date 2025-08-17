@@ -1,5 +1,10 @@
 import { CustomError } from "../util/customError.js";
 
+
+/**
+ * @desc Validate request body against schema
+ * @requires { request } from user
+ */
 export const validate = (schema) => (req, res, next) => {
   try {
     schema.parse(req.body);

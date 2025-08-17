@@ -4,6 +4,8 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
 });
 
+
+// i developed an axios interceptor for adding the token to the headers so that all requests are authenticated 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {

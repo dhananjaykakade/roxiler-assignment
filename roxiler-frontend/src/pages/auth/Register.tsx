@@ -93,7 +93,6 @@ const Register = () => {
         )}
 
         <Card className="w-full max-w-lg rounded-2xl shadow-lg border ">
-          {/* Header */}
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
@@ -113,7 +112,6 @@ const Register = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Form Fields */}
             <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium">Register As</label>

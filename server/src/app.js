@@ -7,7 +7,13 @@ import storeRoutes from "./routes/store.routes.js";
 import ratingRoutes from "./routes/rating.routes.js";
 import adminRoutes from "./routes/admin.routes.js"
 
+/**
+ * @description Express application
+ * @requires { express } for creating the server
+ * @returns { express.Application } Express application instance
+*/
 const app = express();
+
 
 app.use(cors(
     {
@@ -22,10 +28,13 @@ app.use("/api/stores", storeRoutes);
 app.use("/api/ratings", ratingRoutes);
 app.use("/api/admin", adminRoutes);
 
+
+// centralized error handling for 404 errors
 app.use((req, res, next) => {
     return new CustomError("Not Found", 404);
 });
 
+// centralized error handling middleware for all other errors 
 app.use(errorHandler);
 
 export default app;
