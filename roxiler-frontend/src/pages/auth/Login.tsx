@@ -26,7 +26,7 @@ const Login = () => {
     if (user) {
         console.log(user);
       if (user.role === "ADMIN") navigate("/admin/dashboard");
-      if (user.role === "USER") navigate("/user/dashboard");
+      if (user.role === "USER") navigate("/");
       if (user.role === "OWNER") navigate("/owner/dashboard");
     }
 
@@ -84,7 +84,7 @@ const Login = () => {
                 />
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="w-full cursor-pointer">
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>

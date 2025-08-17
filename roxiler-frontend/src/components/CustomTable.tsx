@@ -51,7 +51,7 @@ export function CustomTable<T extends { [key: string]: any }>({
       <p className="text-sm p-2 text-muted-foreground italic">
         click on a column header to sort
       </p>
-      <Table>
+      <Table className="overflow-auto">
         <TableHeader>
           <TableRow>
             {columns.map((col, idx) => (

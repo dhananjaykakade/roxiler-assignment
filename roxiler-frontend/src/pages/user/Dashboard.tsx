@@ -157,7 +157,7 @@ const Dashboard = () => {
     <div className="bg-gray-50 min-h-screen">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 pb-8 sm:px-6 lg:px-8 lg:pt-20">
+      <main className="max-w-7xl pt-20 mx-auto px-4 pb-8 sm:px-6 lg:px-8">
         {error && (
           <Alert variant="destructive" className="mb-6 z-50">
             <AlertDescription>{error}</AlertDescription>
